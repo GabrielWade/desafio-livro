@@ -49,4 +49,12 @@ public class Livro {
     public void setIdioma(Traducao idioma) {
         this.idioma = idioma;
     }
+
+    public Autor getAutor() {
+        return autor;
+    }
+
+    public void setAutor(Autor autor) {
+        this.autor = autor;
+    }
 }

@@ -5,20 +5,26 @@ import com.example.demo.repository.AutorRepository;
 import com.example.demo.repository.LivroRepository;
 import com.example.demo.service.ConsumoApi;
 import com.example.demo.service.ConverteDados;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-
+@Component
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados conversor = new ConverteDados();
     private static final String ENDERECO = "https://gutendex.com/books/";
 
-    private LivroRepository repositorio;
-    private AutorRepository autorRepository;
+    private final LivroRepository repositorio;
+    private final AutorRepository autorRepository;
+
+    public Principal(LivroRepository repositorio, AutorRepository autorRepository) {
+        this.repositorio = repositorio;
+        this.autorRepository = autorRepository;
+    }
     public void exibirMenu() {
         var opcao = -1;
         while (opcao != 6) {
@@ -62,16 +68,16 @@ public class Principal {
         }
     }
     private void buscarLivro() {
-        List<DadosLivro> livros = getDadosLivro();
-        List<Livro> livrosConvertidos = livros.stream().map(Livro::new).collect(Collectors.toList());
-        repositorio.saveAll(livrosConvertidos);
-        List<DadosAutor> autores = getDadosAutor(livros);
-        List<Autor> autoresConvertidos = autores.stream().map(Autor::new).collect(Collectors.toList());
+        List<DadosLivro> dadosLivro = getDadosLivro();
+        DadosLivro primeiroLivroDados = dadosLivro.get(0);
 
-        System.out.println("Livros encontrados: ");
-        livrosConvertidos.forEach(livro -> System.out.println(livro.getTitulo() + " - " + livro.getDownloadCount() + livro.getIdioma()));
-        System.out.println("Autores encontrados: ");
-        autoresConvertidos.forEach(autor -> System.out.println(autor.getName()));
+        System.out.println(primeiroLivroDados);
+        Livro livro = new Livro(primeiroLivroDados);
+        Autor autor = new Autor(primeiroLivroDados.autores().get(0));
+        autorRepository.save(autor);
+        livro.setAutor(autor);
+        System.out.println(livro.getAutor().getName());
+        repositorio.save(livro);
     }
 
     private List<DadosLivro> getDadosLivro() {
@@ -81,13 +87,6 @@ public class Principal {
         OutsideObject outsideObject = conversor.obterDados(json, OutsideObject.class);
         List<DadosLivro> dadosLivros = outsideObject.getResults();
         return dadosLivros;
-    }
-
-    private List<DadosAutor> getDadosAutor(List<DadosLivro> livros) {
-        List<DadosAutor> autores = livros.stream()
-                .flatMap(dadosLivro -> dadosLivro.autores().stream())
-                .collect(Collectors.toList());
-        return autores;
     }
 
 }
