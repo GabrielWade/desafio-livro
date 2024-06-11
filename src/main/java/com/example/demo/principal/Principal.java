@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Scanner;
 @Component
@@ -18,11 +19,11 @@ public class Principal {
     private ConverteDados conversor = new ConverteDados();
     private static final String ENDERECO = "https://gutendex.com/books/";
 
-    private final LivroRepository repositorio;
+    private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
 
-    public Principal(LivroRepository repositorio, AutorRepository autorRepository) {
-        this.repositorio = repositorio;
+    public Principal(LivroRepository livroRepository, AutorRepository autorRepository) {
+        this.livroRepository = livroRepository;
         this.autorRepository = autorRepository;
     }
     public void exibirMenu() {
@@ -70,16 +71,18 @@ public class Principal {
     private void buscarLivro() {
         List<DadosLivro> dadosLivro = getDadosLivro();
         DadosLivro primeiroLivroDados = dadosLivro.get(0);
-
-        System.out.println(primeiroLivroDados);
         Livro livro = new Livro(primeiroLivroDados);
-        Autor autor = new Autor(primeiroLivroDados.autores().get(0));
-        autorRepository.save(autor);
-        livro.setAutor(autor);
-        System.out.println(livro.getAutor().getName());
-        repositorio.save(livro);
-    }
 
+        String autorLivro = primeiroLivroDados.autores().get(0).nome();
+        Autor autor = autorRepository.findByNameContainingIgnoreCase(autorLivro);
+        if (autor == null) {
+            autor = new Autor(primeiroLivroDados.autores().get(0));
+            autorRepository.save(autor);
+        } else {
+            livro.setAutor(autor);
+        }
+        livroRepository.save(livro);
+    }
     private List<DadosLivro> getDadosLivro() {
         System.out.println("Digite o nome do livro: ");
         String nomeLivro = leitura.nextLine();
@@ -87,6 +90,15 @@ public class Principal {
         OutsideObject outsideObject = conversor.obterDados(json, OutsideObject.class);
         List<DadosLivro> dadosLivros = outsideObject.getResults();
         return dadosLivros;
+    }
+
+    private void printLivro(Livro livro) {
+        System.out.println("--------------------------Livro--------------------------");
+        System.out.println("Livro: " + livro.getTitulo());
+        System.out.println("Autor: " + livro.getAutor().getName());
+        System.out.println("Idioma: " + livro.getIdioma());
+        System.out.println("Download Count: " + livro.getDownloadCount());
+        System.out.println("---------------------------------------------------------");
     }
 
 }

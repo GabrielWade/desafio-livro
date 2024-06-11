@@ -10,6 +10,8 @@ public class Autor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
+
     private String name;
     private String nascimento;
     private String falecimento;
