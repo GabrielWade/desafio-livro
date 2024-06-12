@@ -115,6 +115,8 @@ public class Principal {
     private void livrosPorIdioma() {
         System.out.println("PT - PORTUGUES");
         System.out.println("EN - INGLES");
+        System.out.println("ES - ESPANHOL");
+        System.out.println("FR - FRANCES");
         System.out.println("Digite o idioma: ");
         String idioma = leitura.nextLine().toLowerCase();
 
