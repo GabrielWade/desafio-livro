@@ -81,6 +81,7 @@ public class Principal {
             livro.setAutor(autor);
         } else {
             livro.setAutor(autor);
+            autorRepository.save(autor);
         }
         livroRepository.save(livro);
     }
