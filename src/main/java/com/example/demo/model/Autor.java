@@ -13,8 +13,8 @@ public class Autor {
     @Column(unique = true)
 
     private String name;
-    private String nascimento;
-    private String falecimento;
+    private Integer nascimento;
+    private Integer falecimento;
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Livro> livro;
 
@@ -36,19 +36,19 @@ public class Autor {
         this.name = name;
     }
 
-    public String getNascimento() {
+    public Integer getNascimento() {
         return nascimento;
     }
 
-    public void setNascimento(String nascimento) {
+    public void setNascimento(Integer nascimento) {
         this.nascimento = nascimento;
     }
 
-    public String getFalecimento() {
+    public Integer getFalecimento() {
         return falecimento;
     }
 
-    public void setFalecimento(String falecimento) {
+    public void setFalecimento(Integer falecimento) {
         this.falecimento = falecimento;
     }
 }

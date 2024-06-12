@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Scanner;
+
+import static com.example.demo.model.Traducao.fromString;
+
 @Component
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -48,16 +51,16 @@ public class Principal {
                     buscarLivro();
                     break;
                 case 2:
-                    System.out.println("Listar todos os livros");
+                    getLivros();
                     break;
                 case 3:
-                    System.out.println("Listar todos os atores");
+                    getAutores();
                     break;
                 case 4:
-                    System.out.println("Listar atores vivos em um determinado ano");
+                    autoresVivosEmAno();
                     break;
                 case 5:
-                    System.out.println("Listar livros de um determinado idioma");
+                    livrosPorIdioma();
                     break;
                 case 6:
                     System.out.println("Saindo...");
@@ -94,12 +97,47 @@ public class Principal {
         return dadosLivros;
     }
 
+    private void getLivros() {
+        livroRepository.findAll().forEach(this::printLivro);
+    }
+
+    private void getAutores() {
+        autorRepository.findAll().forEach(this::printAutor);
+    }
+
+    private void autoresVivosEmAno() {
+        System.out.println("Digite o ano: ");
+        int ano = leitura.nextInt();
+        List<Autor> autores = autorRepository.findByFalecimentoGreaterThan(ano);
+        autores.forEach(autor -> printAutor(autor));
+    }
+
+    private void livrosPorIdioma() {
+        System.out.println("PT - PORTUGUES");
+        System.out.println("EN - INGLES");
+        System.out.println("Digite o idioma: ");
+        String idioma = leitura.nextLine().toLowerCase();
+
+        Traducao traducao = fromString(idioma);
+
+        List<Livro> livros = livroRepository.findByidioma(traducao);
+        livros.forEach(livro -> printLivro(livro));
+    }
+
     private void printLivro(Livro livro) {
         System.out.println("--------------------------Livro--------------------------");
         System.out.println("Livro: " + livro.getTitulo());
         System.out.println("Autor: " + livro.getAutor().getName());
         System.out.println("Idioma: " + livro.getIdioma());
         System.out.println("Download Count: " + livro.getDownloadCount());
+        System.out.println("---------------------------------------------------------");
+    }
+
+    private void printAutor(Autor autor) {
+        System.out.println("--------------------------Autor--------------------------");
+        System.out.println("Autor: " + autor.getName());
+        System.out.println("Nascimento: " + autor.getNascimento());
+        System.out.println("Falecimento: " + autor.getFalecimento());
         System.out.println("---------------------------------------------------------");
     }
 
