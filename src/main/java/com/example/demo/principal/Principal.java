@@ -78,6 +78,7 @@ public class Principal {
         if (autor == null) {
             autor = new Autor(primeiroLivroDados.autores().get(0));
             autorRepository.save(autor);
+            livro.setAutor(autor);
         } else {
             livro.setAutor(autor);
         }
